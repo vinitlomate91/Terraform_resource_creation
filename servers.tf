@@ -92,26 +92,37 @@ resource "aws_security_group_rule" "k8s_sg_egress" {
     security_group_id = aws_security_group.k8s_sg.id
 }
 
-resource "aws_instance" "master" {
-    instance_type = var.instance_type
-    ami = data.aws_ami.ami_amzn.id
-    vpc_security_group_ids = [aws_security_group.k8s_sg.id]
-    subnet_id = tolist (data.aws_subnets.default.ids) [0]
-    key_name = "k8s"
-    associate_public_ip_address = true
-    tags = {
-        name = "master"
+locals {
+    ec2_names = {
+        master1 = "master-node01"
+        worker1 = "worker-node-1"
+        worker2 = "worker-node-2"
     }
 }
 
-resource "aws_instance" "worker01" {
+resource "aws_instance" "servers" {
+    for_each = local.ec2_names
     instance_type = var.instance_type
     ami = data.aws_ami.ami_amzn.id
+    iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
     vpc_security_group_ids = [aws_security_group.k8s_sg.id]
-    subnet_id = tolist(data.aws_subnets.default.ids) [1]
-    key_name = "k8s"
+    subnet_id = each.key == "master1" ? tolist(data.aws_subnets.default.ids)[0] : tolist(data.aws_subnets.default.ids)[1]
+    key_name = "k8s_1"
     associate_public_ip_address = true
     tags = {
-        name = "worker01"
+        Name = each.value
+    }
+}
+
+resource "aws_instance" "github_runner" {
+    instance_type = var.instance_type
+    ami = data.aws_ami.ami_amzn.id
+    iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+    vpc_security_group_ids = [aws_security_group.k8s_sg.id]
+    subnet_id = tolist(data.aws_subnets.default.ids) [1]
+    key_name = "k8s_1"
+    associate_public_ip_address = true
+    tags = {
+        Name = "github_runner"
     }
 }
