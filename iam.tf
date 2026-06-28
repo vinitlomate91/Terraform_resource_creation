@@ -28,6 +28,7 @@ resource "aws_iam_policy" "k8s_policy" {
                         "s3:*",
                         "logs:*",
                         "iam:*"
+                        "rds:*"
                     ]
                     Effect = "Allow"
                     Resource = "*"
