@@ -7,6 +7,14 @@ resource "aws_s3_bucket" "s3_state" {
      }
 }
 
+resource "aws_s3_bucket" "s3_state1" {
+     bucket = "testing28062026"
+
+     tags = {
+        Name = "testing28062026"
+     }
+}
+
 resource "aws_s3_bucket_versioning" "s3_versioning" {
      bucket = aws_s3_bucket.s3_state.id
 
