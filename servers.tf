@@ -126,3 +126,13 @@ resource "aws_instance" "github_runner" {
         Name = "github_runner"
     }
 }
+
+terraform {
+  backend "s3" {
+    bucket       = "terraforms3328062026"
+    key          = "ec2/terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
